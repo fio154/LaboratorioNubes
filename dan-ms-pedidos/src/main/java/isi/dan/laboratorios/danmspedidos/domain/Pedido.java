@@ -1,4 +1,7 @@
-package isi.dan.laboratorios.danmsusuarios.domain;
+package isi.dan.laboratorios.danmspedidos.domain;
+
+import java.time.Instant;
+import java.util.List;
 
 public class Pedido {
     

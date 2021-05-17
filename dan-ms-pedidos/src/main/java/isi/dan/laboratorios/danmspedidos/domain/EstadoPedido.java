@@ -1,4 +1,4 @@
-package isi.dan.laboratorios.danmsusuarios.domain;
+package isi.dan.laboratorios.danmspedidos.domain;
 
 public class EstadoPedido {
     

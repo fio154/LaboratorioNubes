@@ -1,4 +1,4 @@
-package isi.dan.laboratorios.danmsusuarios.domain;
+package isi.dan.laboratorios.danmspedidos.domain;
 
 public class DetallePedido {
     
@@ -31,6 +31,5 @@ public class DetallePedido {
 	public void setProducto(Producto producto) {
 		this.producto = producto;
 	}
-
 
 }
