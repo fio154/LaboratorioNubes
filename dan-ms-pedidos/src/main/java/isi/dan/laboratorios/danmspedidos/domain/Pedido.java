@@ -30,6 +30,9 @@ public class Pedido {
 	public void setDetallesPedido(List<DetallePedido> detallesPedido) {
 		this.detallesPedido = detallesPedido;
 	}
+	public void setItemDetallePedido(DetallePedido detallePedido) {
+		this.detallesPedido.add(detallePedido);
+	}
 	public EstadoPedido getEstado() {
 		return estado;
 	}
