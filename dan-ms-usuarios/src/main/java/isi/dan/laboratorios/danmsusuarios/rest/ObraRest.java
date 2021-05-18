@@ -26,7 +26,7 @@ import isi.dan.laboratorios.danmsusuarios.domain.Obra;
 public class ObraRest {
     static final String API_OBRA = "/api/obra";
     
-    private static final List<Obra> listaObras = new ArrayList<>();
+    private static final List<Obra> listaObras = new ArrayList<Obra>();
     private static Integer ID_GEN = 1;
 
     @GetMapping(path = "/{id}")
@@ -54,7 +54,19 @@ public class ObraRest {
         return ResponseEntity.of(o);
     }
 
-    //FALTA GET por cliente y/o tipo de obra
+    //GET por cliente y/o tipo de obra (query string OPC) -> Retorna una lista de obras
+    @GetMapping(path = "/nombre")
+    @ResponseBody
+    public ResponseEntity<List<Obra>> obraPorClienteOTipoObra(
+        @RequestParam(required = false) String idCliente, @RequestParam(required = false)  String tipoObra) {
+
+        List<Obra> o =  listaObras
+                .stream()
+                .filter(unaObra -> (unaObra.getCliente().getId().toString().equals(idCliente)) || (unaObra.getTipo().getId().toString().equals(tipoObra)))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(o);
+    }
 
     @PostMapping
     public ResponseEntity<Obra> crear(@RequestBody Obra nuevo){
