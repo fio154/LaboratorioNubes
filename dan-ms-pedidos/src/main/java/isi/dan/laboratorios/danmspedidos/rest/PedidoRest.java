@@ -1,6 +1,24 @@
-package main.java.isi.dan.laboratorios.danmspedidos.rest;
+package isi.dan.laboratorios.danmspedidos.rest;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.stream.IntStream;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import isi.dan.laboratorios.danmspedidos.domain.DetallePedido;
+import isi.dan.laboratorios.danmspedidos.domain.Pedido;
 
 import isi.dan.laboratorios.danmspedidos.domain.Pedido;
 
@@ -51,9 +69,8 @@ public class PedidoRest {
     }
 
     @PostMapping(path = "/{idPedido}/detalle")
-    @PostMapping
     public ResponseEntity<Pedido> crearItem(@RequestBody DetallePedido nuevoItem, @RequestBody Pedido pedido){
-    	System.out.println("Crear item a pedido "+ nuevo);
+    	System.out.println("Crear item " + nuevoItem + " a pedido " + pedido);
         
         for(int i=0; i<listaPedidos.size(); i++){
             
