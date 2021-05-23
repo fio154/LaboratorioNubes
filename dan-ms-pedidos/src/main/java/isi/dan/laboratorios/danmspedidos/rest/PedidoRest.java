@@ -29,13 +29,14 @@ public class PedidoRest {
     
     private static final List<Pedido> listaPedidos = new ArrayList<Pedido>();
     private static Integer ID_GEN = 1;
+    private static Integer indexPedido;
 
     @GetMapping(path = "/{idPedido}")
-    public ResponseEntity<Pedido> pedidoPorId(@PathVariable Integer id){
+    public ResponseEntity<Pedido> pedidoPorId(@PathVariable Integer idPedido){
 
         Optional<Pedido> p =  listaPedidos
                 .stream()
-                .filter(unPe -> unPe.getId().equals(id))
+                .filter(unPe -> unPe.getId().equals(idPedido))
                 .findFirst();
         return ResponseEntity.of(p);
     }
@@ -46,19 +47,42 @@ public class PedidoRest {
     }
 
     //GET por id de obra
-    @ResponseBody
-    public ResponseEntity<Pedido> pedidoPorIdObra(@PathVariable Integer id){
+    @GetMapping(path = "/obra/{idObra}")
+    public ResponseEntity<Pedido> pedidoPorIdObra(@PathVariable Integer idObra){
 
         Optional<Pedido> p =  listaPedidos
                 .stream()
-                .filter(unPe -> unPe.getObra().getId().toString().equals(id))
+                .filter(unPe -> unPe.getObra().getId().equals(idObra))
                 .findFirst();
         return ResponseEntity.of(p);
     }
 
     //FALTA GET Por Cuit y/o ID de Cliente
-    //FALTA GET Buscar detalle por ID: “/api/pedido/{idPedido}/detalle/{id}”
 
+
+
+    //FALTA GET Buscar detalle por ID: “/api/pedido/{idPedido}/detalle/{id}”
+    @GetMapping(path = "/{idPedido}/detalle/{id}")
+    public ResponseEntity<Pedido> pedidoPorDetalle(@PathVariable Integer idPedido, @PathVariable Integer id){
+        //final int indexPedido = 0;
+        for(int i=0; i<listaPedidos.size(); i++){
+            
+            if(listaPedidos.get(i).getId().equals(idPedido)){
+                indexPedido = i;
+                break;
+            }
+        } 
+        
+        OptionalInt indexOpt =   IntStream.range(0, listaPedidos.get(indexPedido).getDetallesPedido().size())
+        .filter(i -> listaPedidos.get(indexPedido).getDetallesPedido().get(i).getId().equals(id))
+        .findFirst();
+
+        if(indexOpt.isPresent()){
+            return ResponseEntity.of(listaPedidos.get(indexPedido).getDetallesPedido().get(indexOpt.getAsInt()));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @PostMapping
     public ResponseEntity<Pedido> crear(@RequestBody Pedido nuevo){
@@ -69,13 +93,14 @@ public class PedidoRest {
     }
 
     @PostMapping(path = "/{idPedido}/detalle")
-    public ResponseEntity<Pedido> crearItem(@RequestBody DetallePedido nuevoItem, @RequestBody Pedido pedido){
-    	System.out.println("Crear item " + nuevoItem + " a pedido " + pedido);
-        
+    public ResponseEntity<Pedido> crearItem(@RequestBody DetallePedido nuevoItem, @PathVariable Integer idPedido){
+    	System.out.println("Crear item " + nuevoItem + " a pedido de id: " + idPedido);
+        Pedido pedido = null;
         for(int i=0; i<listaPedidos.size(); i++){
             
-            if(listaPedidos.get(i).getId().equals(pedido.getId())){
-                pedido.setItemDetallePedido(nuevoItem);
+            if(listaPedidos.get(i).getId().equals(idPedido)){
+                listaPedidos.get(i).setItemDetallePedido(nuevoItem);
+                pedido = listaPedidos.get(i);
                 break;
             }
 
@@ -84,9 +109,9 @@ public class PedidoRest {
     }
 
     @PutMapping(path = "/{idPedido}")
-    public ResponseEntity<Pedido> actualizar(@RequestBody Pedido nuevo,  @PathVariable Integer id) {
+    public ResponseEntity<Pedido> actualizar(@RequestBody Pedido nuevo,  @PathVariable Integer idPedido) {
         OptionalInt indexOpt =   IntStream.range(0, listaPedidos.size())
-        .filter(i -> listaPedidos.get(i).getId().equals(id))
+        .filter(i -> listaPedidos.get(i).getId().equals(idPedido))
         .findFirst();
 
         if(indexOpt.isPresent()){
@@ -98,9 +123,9 @@ public class PedidoRest {
     }
 
     @DeleteMapping(path = "/{idPedido}")
-    public ResponseEntity<Pedido> borrar(@PathVariable Integer id){
+    public ResponseEntity<Pedido> borrar(@PathVariable Integer idPedido){
         OptionalInt indexOpt =   IntStream.range(0, listaPedidos.size())
-        .filter(i -> listaPedidos.get(i).getId().equals(id))
+        .filter(i -> listaPedidos.get(i).getId().equals(idPedido))
         .findFirst();
 
         if(indexOpt.isPresent()){
@@ -111,7 +136,28 @@ public class PedidoRest {
         }
     }
 
-    //ACÁ FALTA DELETE POR DETALLE
+    @DeleteMapping(path = "/{idPedido}/detalle/{id}")
+    public ResponseEntity<Pedido> borrarDetalle(@PathVariable Integer idPedido, @PathVariable Integer id){
+        //final int indexPedido = 0;
+        for(int i=0; i<listaPedidos.size(); i++){
+            
+            if(listaPedidos.get(i).getId().equals(idPedido)){
+                indexPedido = i;
+                break;
+            }
+        } 
+        
+        OptionalInt indexOpt =   IntStream.range(0, listaPedidos.get(indexPedido).getDetallesPedido().size())
+        .filter(i -> listaPedidos.get(indexPedido).getDetallesPedido().get(i).getId().equals(id))
+        .findFirst();
+
+        if(indexOpt.isPresent()){
+            listaPedidos.get(indexPedido).getDetallesPedido().remove(indexOpt.getAsInt());
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 
 
