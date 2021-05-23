@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -58,30 +60,35 @@ public class PedidoRest {
     }
 
     //FALTA GET Por Cuit y/o ID de Cliente
+   /* @GetMapping(path = "/nombre")
+    @ResponseBody
+    public ResponseEntity<List<Pedido>> pedidoPorCuitOIdCliente(@RequestParam(required = false) Integer cuit, @RequestParam(required = false)  Integer id) {
+
+        List<Pedido> o =  listaPedidos
+                .stream()
+                .filter(unPedido -> (unPedido.getCliente().getId().equals(id)) || (unPedido.getCliente().getCuit().equals(cuit)))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(o);
+    }*/
 
 
-
-    //FALTA GET Buscar detalle por ID: “/api/pedido/{idPedido}/detalle/{id}”
     @GetMapping(path = "/{idPedido}/detalle/{id}")
-    public ResponseEntity<Pedido> pedidoPorDetalle(@PathVariable Integer idPedido, @PathVariable Integer id){
-        //final int indexPedido = 0;
-        for(int i=0; i<listaPedidos.size(); i++){
-            
-            if(listaPedidos.get(i).getId().equals(idPedido)){
-                indexPedido = i;
-                break;
-            }
-        } 
-        
-        OptionalInt indexOpt =   IntStream.range(0, listaPedidos.get(indexPedido).getDetallesPedido().size())
-        .filter(i -> listaPedidos.get(indexPedido).getDetallesPedido().get(i).getId().equals(id))
-        .findFirst();
+    public ResponseEntity<DetallePedido> pedidoPorDetalle(@PathVariable Integer idPedido, @PathVariable Integer id){
 
-        if(indexOpt.isPresent()){
-            return ResponseEntity.of(listaPedidos.get(indexPedido).getDetallesPedido().get(indexOpt.getAsInt()));
-        } else {
-            return ResponseEntity.notFound().build();
+        DetallePedido detallePedido = new DetallePedido();
+
+        for(int i=0; i<listaPedidos.size(); i++){
+            for(int j=0; j<listaPedidos.get(i).getDetallesPedido().size(); j++){
+                if(listaPedidos.get(i).getId().equals(idPedido) && listaPedidos.get(i).getDetallesPedido().get(j).getId().equals(id)){
+                    detallePedido = listaPedidos.get(i).getDetallesPedido().get(j);
+                    break;
+                }
+            }
         }
+
+        return ResponseEntity.ok(detallePedido);
+       
     }
 
     @PostMapping
